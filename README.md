@@ -5,13 +5,13 @@ Paper Yolo v4: https://arxiv.org/abs/2004.10934
 
 More details: http://pjreddie.com/darknet/yolo/
 
-
+[![Darknet Continuous Integration](https://github.com/AlexeyAB/darknet/workflows/Darknet%20Continuous%20Integration/badge.svg)](https://github.com/AlexeyAB/darknet/actions?query=workflow%3A%22Darknet+Continuous+Integration%22)
 [![CircleCI](https://circleci.com/gh/AlexeyAB/darknet.svg?style=svg)](https://circleci.com/gh/AlexeyAB/darknet)
 [![TravisCI](https://travis-ci.org/AlexeyAB/darknet.svg?branch=master)](https://travis-ci.org/AlexeyAB/darknet)
-[![AppveyorCI](https://ci.appveyor.com/api/projects/status/594bwb5uoc1fxwiu/branch/master?svg=true)](https://ci.appveyor.com/project/AlexeyAB/darknet/branch/master)
 [![Contributors](https://img.shields.io/github/contributors/AlexeyAB/Darknet.svg)](https://github.com/AlexeyAB/darknet/graphs/contributors)
 [![License: Unlicense](https://img.shields.io/badge/license-Unlicense-blue.svg)](https://github.com/AlexeyAB/darknet/blob/master/LICENSE)
 [![DOI](https://zenodo.org/badge/75388965.svg)](https://zenodo.org/badge/latestdoi/75388965)
+[![arxiv.org](http://img.shields.io/badge/cs.CV-arXiv%3A2004.10934-B31B1B.svg)](https://arxiv.org/abs/2004.10934)
 
 
 * [Requirements (and how to install dependecies)](#requirements)
@@ -130,7 +130,7 @@ You can get cfg-files by path: `darknet/cfg/`
 ### Requirements
 
 * Windows or Linux
-* **CMake >= 3.8** for modern CUDA support: https://cmake.org/download/
+* **CMake >= 3.12**: https://cmake.org/download/
 * **CUDA 10.0**: https://developer.nvidia.com/cuda-toolkit-archive (on Linux do [Post-installation Actions](https://docs.nvidia.com/cuda/cuda-installation-guide-linux/index.html#post-installation-actions))
 * **OpenCV >= 2.4**: use your preferred package manager (brew, apt), build from source using [vcpkg](https://github.com/Microsoft/vcpkg) or download from [OpenCV official site](https://opencv.org/releases.html) (on Windows set system variable `OpenCV_DIR` = `C:\opencv\build` - where are the `include` and `x64` folders [image](https://user-images.githubusercontent.com/4096485/53249516-5130f480-36c9-11e9-8238-a6e82e48c6f2.png))
 * **cuDNN >= 7.0 for CUDA 10.0** https://developer.nvidia.com/rdp/cudnn-archive (on **Linux** copy `cudnn.h`,`libcudnn.so`... as desribed here https://docs.nvidia.com/deeplearning/sdk/cudnn-install/index.html#installlinux-tar , on **Windows** copy `cudnn.h`,`cudnn64_7.dll`, `cudnn64_7.lib` as desribed here https://docs.nvidia.com/deeplearning/sdk/cudnn-install/index.html#installwindows )
@@ -167,7 +167,7 @@ Others: https://www.youtube.com/user/pjreddie/videos
 
 ### Improvements in this repository
 
-* added support for Windows
+* developed State-of-the-Art object detector YOLOv4
 * added State-of-Art models: CSP, PRN, EfficientNet
 * added layers: [conv_lstm], [scale_channels] SE/ASFF/BiFPN, [local_avgpool], [sam], [Gaussian_yolo], [reorg3d] (fixed [reorg]), fixed [batchnorm]
 * added the ability for training recurrent models (with layers conv-lstm`[conv_lstm]`/conv-rnn`[crnn]`) for accurate detection on video
@@ -187,6 +187,7 @@ Others: https://www.youtube.com/user/pjreddie/videos
 * added calculation of anchors for training
 * added example of Detection and Tracking objects: https://github.com/AlexeyAB/darknet/blob/master/src/yolo_console_dll.cpp
 * run-time tips and warnings if you use incorrect cfg-file or dataset
+* added support for Windows
 * many other fixes of code...
 
 And added manual - [How to train Yolo v4-v2 (to detect your custom objects)](#how-to-train-to-detect-your-custom-objects)
@@ -242,14 +243,10 @@ The `CMakeLists.txt` will attempt to find installed optional dependencies like
 CUDA, cudnn, ZED and build against those. It will also create a shared object
 library file to use `darknet` for code development.
 
-Do inside the cloned repository:
+Open a bash terminal inside the cloned repository and launch:
 
-```
-mkdir build-release
-cd build-release
-cmake ..
-make
-make install
+```bash
+./build.sh
 ```
 
 ### How to compile on Linux (using `make`)
@@ -270,51 +267,34 @@ Before make, you can set such options in the `Makefile`: [link](https://github.c
 
 To run Darknet on Linux use examples from this article, just use `./darknet` instead of `darknet.exe`, i.e. use this command: `./darknet detector test ./cfg/coco.data ./cfg/yolov4.cfg ./yolov4.weights`
 
-### How to compile on Windows (using `CMake-GUI`)
+### How to compile on Windows (using `CMake`)
 
 This is the recommended approach to build Darknet on Windows if you have already
 installed Visual Studio 2015/2017/2019, CUDA > 10.0, cuDNN > 7.0, and
 OpenCV > 2.4.
 
-Use `CMake-GUI` as shown here on this [**IMAGE**](https://user-images.githubusercontent.com/4096485/55107892-6becf380-50e3-11e9-9a0a-556a943c429a.png):
+Open a Powershell terminal inside the cloned repository and launch:
 
-1. Configure
-2. Optional platform for generator (Set: x64)
-3. Finish
-4. Generate
-5. Open Project
-6. Set: x64 & Release
-7. Build
-8. Build solution
+```PowerShell
+.\build.ps1
+```
 
 ### How to compile on Windows (using `vcpkg`)
 
-If you have already installed Visual Studio 2015/2017/2019, CUDA > 10.0,
-cuDNN > 7.0, OpenCV > 2.4, then to compile Darknet it is recommended to use
-[CMake-GUI](#how-to-compile-on-windows-using-cmake-gui).
-
-Otherwise, follow these steps:
-
 1. Install or update Visual Studio to at least version 2017, making sure to have it fully patched (run again the installer if not sure to automatically update to latest version). If you need to install from scratch, download VS from here: [Visual Studio Community](http://visualstudio.com)
 
-2. Install CUDA and cuDNN
+2. Install CUDA
 
-3. Install `git` and `cmake`. Make sure they are on the Path at least for the current account
+3. Install [vcpkg](https://github.com/Microsoft/vcpkg) and try to install a test library to make sure everything is working, for example `vcpkg install opengl`
 
-4. Install [vcpkg](https://github.com/Microsoft/vcpkg) and try to install a test library to make sure everything is working, for example `vcpkg install opengl`
-
-5. Define an environment variables, `VCPKG_ROOT`, pointing to the install path of `vcpkg`
-
-6. Define another environment variable, with name `VCPKG_DEFAULT_TRIPLET` and value `x64-windows`
-
-7. Open Powershell and type these commands:
+4. Open Powershell and type these commands:
 
 ```PowerShell
-PS \>                  cd $env:VCPKG_ROOT
-PS Code\vcpkg>         .\vcpkg install pthreads opencv[ffmpeg] #replace with opencv[cuda,ffmpeg] in case you want to use cuda-accelerated openCV
+PS \>                  cd vcpkg
+PS Code\vcpkg>         .\vcpkg install darknet[full]:x64-windows #replace with darknet[opencv-base,weights]:x64-windows for a quicker install; use --head if you want to build latest commit on master branch and not latest release
 ```
 
-8.  Open Powershell, go to the `darknet` folder and build with the command `.\build.ps1`. If you want to use Visual Studio, you will find two custom solutions created for you by CMake after the build, one in `build_win_debug` and the other in `build_win_release`, containing all the appropriate config flags for your system.
+5. You will find darknet inside the vcpkg\installed\x64-windows\tools\darknet folder, together with all the necessary weight and cfg files
 
 ### How to compile on Windows (legacy way)
 
@@ -404,7 +384,7 @@ Training Yolo v4 (and v3):
 
   * change line batch to [`batch=64`](https://github.com/AlexeyAB/darknet/blob/0039fd26786ab5f71d5af725fc18b3f521e7acfd/cfg/yolov3.cfg#L3)
   * change line subdivisions to [`subdivisions=16`](https://github.com/AlexeyAB/darknet/blob/0039fd26786ab5f71d5af725fc18b3f521e7acfd/cfg/yolov3.cfg#L4)
-  * change line max_batches to (`classes*2000` but not less than `4000`), f.e. [`max_batches=6000`](https://github.com/AlexeyAB/darknet/blob/0039fd26786ab5f71d5af725fc18b3f521e7acfd/cfg/yolov3.cfg#L20) if you train for 3 classes
+  * change line max_batches to (`classes*2000` but not less than number of training images, and not less than `6000`), f.e. [`max_batches=6000`](https://github.com/AlexeyAB/darknet/blob/0039fd26786ab5f71d5af725fc18b3f521e7acfd/cfg/yolov3.cfg#L20) if you train for 3 classes
   * change line steps to 80% and 90% of max_batches, f.e. [`steps=4800,5400`](https://github.com/AlexeyAB/darknet/blob/0039fd26786ab5f71d5af725fc18b3f521e7acfd/cfg/yolov3.cfg#L22)
   * set network size `width=416 height=416` or any value multiple of 32: https://github.com/AlexeyAB/darknet/blob/0039fd26786ab5f71d5af725fc18b3f521e7acfd/cfg/yolov3.cfg#L8-L9
   * change line `classes=80` to your number of objects in each of 3 `[yolo]`-layers:
@@ -526,7 +506,7 @@ If you made you custom model that isn't based on other models, then you can trai
  
 ## When should I stop training:
 
-Usually sufficient 2000 iterations for each class(object), but not less than 4000 iterations in total. But for a more precise definition when you should stop training, use the following manual:
+Usually sufficient 2000 iterations for each class(object), but not less than number of training images and not less than 6000 iterations in total. But for a more precise definition when you should stop training, use the following manual:
 
 1. During training, you will see varying indicators of error, and you should stop when no longer decreases **0.XXXXXXX avg**:
 
@@ -540,6 +520,8 @@ Usually sufficient 2000 iterations for each class(object), but not less than 400
   * **0.60730 avg** - average loss (error) - **the lower, the better**
 
   When you see that average loss **0.xxxxxx avg** no longer decreases at many iterations then you should stop training. The final avgerage loss can be from `0.05` (for a small model and easy dataset) to `3.0` (for a big model and a difficult dataset).
+  
+  Or if you train with flag `-map` then you will see mAP indicator `Last accuracy mAP@0.5 = 18.50%` in the console - this indicator is better than Loss, so train while mAP increases. 
 
 2. Once training is stopped, you should take some of last `.weights`-files from `darknet\build\darknet\x64\backup` and choose the best of them:
 
@@ -666,28 +648,6 @@ Different tools for marking objects in images:
 3. in Python: https://github.com/Cartucho/OpenLabeling
 4. in C++: https://www.ccoderun.ca/darkmark/
 5. in JavaScript: https://github.com/opencv/cvat
-
-
-## Using Yolo9000
-
- Simultaneous detection and classification of 9000 objects: `darknet.exe detector test cfg/combine9k.data cfg/yolo9000.cfg yolo9000.weights data/dog.jpg`
-
-* `yolo9000.weights` - (186 MB Yolo9000 Model) requires 4 GB GPU-RAM: http://pjreddie.com/media/files/yolo9000.weights
-
-* `yolo9000.cfg` - cfg-file of the Yolo9000, also there are paths to the `9k.tree` and `coco9k.map`  https://github.com/AlexeyAB/darknet/blob/617cf313ccb1fe005db3f7d88dec04a04bd97cc2/cfg/yolo9000.cfg#L217-L218
-
-    * `9k.tree` - **WordTree** of 9418 categories  - `<label> <parent_it>`, if `parent_id == -1` then this label hasn't parent: https://raw.githubusercontent.com/AlexeyAB/darknet/master/build/darknet/x64/data/9k.tree
-
-    * `coco9k.map` - map 80 categories from MSCOCO to WordTree `9k.tree`: https://raw.githubusercontent.com/AlexeyAB/darknet/master/build/darknet/x64/data/coco9k.map
-
-* `combine9k.data` - data file, there are paths to: `9k.labels`, `9k.names`, `inet9k.map`, (change path to your `combine9k.train.list`): https://raw.githubusercontent.com/AlexeyAB/darknet/master/build/darknet/x64/data/combine9k.data
-
-    * `9k.labels` - 9418 labels of objects: https://raw.githubusercontent.com/AlexeyAB/darknet/master/build/darknet/x64/data/9k.labels
-
-    * `9k.names` -
-9418 names of objects: https://raw.githubusercontent.com/AlexeyAB/darknet/master/build/darknet/x64/data/9k.names
-
-    * `inet9k.map` - map 200 categories from ImageNet to WordTree `9k.tree`: https://raw.githubusercontent.com/AlexeyAB/darknet/master/build/darknet/x64/data/inet9k.map
 
 
 ## How to use Yolo as DLL and SO libraries
